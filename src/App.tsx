@@ -1,5 +1,6 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import type { Product } from './types';
+import { useDebounce } from './hooks/useDebounce';
 
 const MOCK_PRODUCTS: Product[] = [
   { productId: 'p-101', name: 'Wireless Noise-Canceling Headphones', manufacturer: 'Sony', category: 'Electronics', price: 299.99, description: 'Industry leading noise cancellation.', attributes: { color: 'Black' } },
@@ -9,20 +10,19 @@ const MOCK_PRODUCTS: Product[] = [
 ];
 
 function App() {
-  // Search input state
   const [searchQuery, setSearchQuery] = useState<string>('');
-
-  // Product result list state
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasSearched, setHasSearched] = useState<boolean>(false);
+
+  const debouncedSearchQuery = useDebounce(searchQuery, 400);
 
   // Placeholder fetch function to simulate API call
   const fetchProducts = async (query: string) => {
     setIsLoading(true);
 
     // Simulate 1 second delay for fetching
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     // Simple filtering logic
     const filteredResults = MOCK_PRODUCTS.filter(product =>
@@ -35,8 +35,11 @@ function App() {
 
   // Use effect hook
   useEffect(() => {
-    fetchProducts('');
-  }, []);
+    if (debouncedSearchQuery !== '') {
+      setHasSearched(true);
+    }
+    fetchProducts(debouncedSearchQuery);
+  }, [debouncedSearchQuery]);
   
   // Placeholder search function to be implemented
   const handleSearch = async (e: FormEvent<HTMLFormElement>) => {
