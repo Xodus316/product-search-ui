@@ -1,6 +1,7 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect } from 'react';
 import type { Product } from './types';
 import { useDebounce } from './hooks/useDebounce';
+import { ProductCard } from './components/ProductCard';
 
 const MOCK_PRODUCTS: Product[] = [
   { productId: 'p-101', name: 'Wireless Noise-Canceling Headphones', manufacturer: 'Sony', category: 'Electronics', price: 299.99, description: 'Industry leading noise cancellation.', attributes: { color: 'Black' } },
@@ -41,45 +42,42 @@ function App() {
     fetchProducts(debouncedSearchQuery);
   }, [debouncedSearchQuery]);
   
-  // Placeholder search function to be implemented
-  const handleSearch = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setHasSearched(true);
-    await fetchProducts(searchQuery);
-  };
-
   return (
-    <div style={{ padding: '2rem', fontFamily: 'sans-serif'}}>
-      <h1>Product Catalog Search</h1>
-      <form onSubmit={ handleSearch } style={{ marginBottom: '2rem' }}>
-        <input
-              type="text"
-              value={ searchQuery }
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search for products..."
-              style={{ padding: '0.5rem', width: '300px', marginRight: '1rem' }}
-            />
-            <button type="submit" style={{ padding: '0.5rem 1rem' }} disabled={isLoading}>
-            {isLoading ? 'Searching...' : 'Search'}
-            </button>
-      </form>
-
-      {/* Conditional logic */}
-      {isLoading ? (
-        <p>Loading products from server...</p>
-      ) : products.length > 0 ? (
-        <div style = {{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
-          {products.map((product) => (
-            <div key={product.productId} style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
-              <h3 style={{ margin: '0 0 0.5rem 0' }}>{product.name}</h3>
-              <p style={{ fontSize: '0.9rem', color: '#666', margin: '0 0 1rem 0' }}>{product.manufacturer}</p>
-              <p style={{ fontWeight: 'bold', margin: '0' }}>${product.price.toFixed(2)}</p>
-            </div>
-          ))}
+    <div style={{ padding: '2rem', fontFamily: 'system-ui, sans-serif', maxWidth: '1200px', margin: '0 auto' }}>
+      <header style={{ marginBottom: '2rem', borderBottom: '1px solid #eee', paddingBottom: '1rem' }}>
+        <h1 style={{ margin: '0 0 2rem 0', color: '#111' }}>Product Catalog Search</h1>
+        <div style={{ display: 'flex', alignItems: 'center'}}>
+          <input
+                type="text"
+                value={ searchQuery }
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search by name or brand..."
+                style={{ 
+                  padding: '0.75rem', 
+                  width: '100%', 
+                  maxWidth: '400px',
+                  borderRadius: '8px',
+                  border: '1px solid #ccc',
+                  fontSize: '1rem',
+                }}
+              />
+              {isLoading && <span style={{ marginLeft: '1rem', color: '#2563eb', fontWeight: '500' }}>Searching...</span>}
         </div>
-      ) : (
-        <p>No products found {hasSearched && `for "${searchQuery}"`}</p>
-      )}
+      </header>
+
+      <main>
+        {products.length > 0 ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+            {products.map(product => (
+              <ProductCard key={product.productId} product={product} />
+            ))}
+          </div>
+        ) : (
+          <div style={{ textAlign: 'center', padding: '3rem', color: '#666', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+            <p>No products found {hasSearched && `for "${searchQuery}"`}</p>
+          </div>
+        )}
+      </main>
     </div>
   )
 }
