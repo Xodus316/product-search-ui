@@ -3,13 +3,6 @@ import type { Product } from './types';
 import { useDebounce } from './hooks/useDebounce';
 import { ProductCard } from './components/ProductCard';
 
-const MOCK_PRODUCTS: Product[] = [
-  { productId: 'p-101', name: 'Wireless Noise-Canceling Headphones', manufacturer: 'Sony', category: 'Electronics', price: 299.99, description: 'Industry leading noise cancellation.', attributes: { color: 'Black' } },
-  { productId: 'p-102', name: 'Mechanical Gaming Keyboard', manufacturer: 'Keychron', category: 'Electronics', price: 109.50, description: 'Hot-swappable tactile switches.', attributes: { color: 'Grey' } },
-  { productId: 'p-103', name: 'Ergonomic Office Chair', manufacturer: 'Herman Miller', category: 'Furniture', price: 950.00, description: 'Adjustable lumbar support.', attributes: { color: 'Graphite', material: 'Mesh' } },
-  { productId: 'p-104', name: 'Stainless Steel Water Bottle', manufacturer: 'Yeti', category: 'Outdoors', price: 35.00, description: 'Double-wall vacuum insulated.', attributes: { color: 'Navy' } }
-];
-
 function App() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [products, setProducts] = useState<Product[]>([]);
@@ -22,16 +15,25 @@ function App() {
   const fetchProducts = async (query: string) => {
     setIsLoading(true);
 
-    // Simulate 1 second delay for fetching
-    await new Promise(resolve => setTimeout(resolve, 500));
+    try {
+      const response = await fetch('http://localhost:8080/api/products');
 
-    // Simple filtering logic
-    const filteredResults = MOCK_PRODUCTS.filter(product =>
-      product.name.toLowerCase().includes(query.toLowerCase()) ||
-      product.description.toLowerCase().includes(query.toLowerCase())
-    );
-    setIsLoading(false);
-    setProducts(filteredResults);
+      if (!response.ok) {
+        throw new Error('HTTP error. Status: ${response.status} ');
+      }
+
+      const data: Product[] = await response.json();
+      const filteredResults = data.filter(product =>
+        product.name.toLowerCase().includes(query.toLowerCase()) ||
+        product.brand.toLowerCase().includes(query.toLowerCase())
+      );
+
+      setProducts(filteredResults);
+    } catch (error) {
+      console.error('Could not fetch products from the API: ', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Use effect hook
@@ -45,7 +47,7 @@ function App() {
   return (
     <div style={{ padding: '2rem', fontFamily: 'system-ui, sans-serif', maxWidth: '1200px', margin: '0 auto' }}>
       <header style={{ marginBottom: '2rem', borderBottom: '1px solid #eee', paddingBottom: '1rem' }}>
-        <h1 style={{ margin: '0 0 2rem 0', color: '#111' }}>Product Catalog Search</h1>
+        <h1 style={{ margin: '0 0 2rem 0', color: '#f30808' }}>Product Catalog Search</h1>
         <div style={{ display: 'flex', alignItems: 'center'}}>
           <input
                 type="text"
