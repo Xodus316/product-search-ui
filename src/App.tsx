@@ -66,7 +66,7 @@ function App() {
 
         <button 
           onClick={() => setShowForm(!showForm)}
-          style={{ padding: '0.75rem 1.5rem', backGroundColor: "#111", color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
+          style={{ padding: '0.75rem 1.5rem', backgroundColor: "#111", color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
         >
           {showForm ? 'Close Form' : 'Add Product'}
         </button>

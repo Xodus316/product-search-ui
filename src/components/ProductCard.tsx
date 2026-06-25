@@ -1,6 +1,8 @@
 import type { Product } from '../types';
+import { useNavigate } from 'react-router-dom';
 
 export function ProductCard({ product }: { product: Product }) {
+    const navigate = useNavigate();
     return (
         <div style={{
             border: '1px solid #e0e0e0',
@@ -22,7 +24,9 @@ export function ProductCard({ product }: { product: Product }) {
                 <p style={{ fontWeight: 'bold', margin: '0', color: '#2c3e50', fontSize: '1.2rem' }}>
                     ${product.price.toFixed(2)}
                 </p>
-                <button style={{
+                <button 
+                onClick={() => navigate(`/product/${product.productId}`)}
+                style={{
                     padding: '0.5rem 1rem',
                     backgroundColor: '#2563eb',
                     color: 'white',
